@@ -10,6 +10,7 @@ open Microsoft.AspNetCore.Authentication.Cookies
 open Microsoft.AspNetCore.Http
 open Handlers
 open WebServer
+open Microsoft.Extensions.Configuration
 
 module App =
 
@@ -47,6 +48,10 @@ module App =
         services.AddCors()    |> ignore
         services.AddGiraffe() |> ignore
 
+    let configureConfig (w: WebHostBuilderContext) (c: IConfigurationBuilder) =
+        c.AddJsonFile("appsettings.json") |> ignore
+        ()
+        
     [<EntryPoint>]
     let main _ =
         let contentRoot = Directory.GetCurrentDirectory()
@@ -56,6 +61,7 @@ module App =
             .UseContentRoot(contentRoot)
             .UseIISIntegration()
             .UseWebRoot(webRoot)
+            .ConfigureAppConfiguration(Action<WebHostBuilderContext, IConfigurationBuilder> configureConfig)
             .Configure(Action<IApplicationBuilder> configureApp)
             .ConfigureServices(configureServices)
             .ConfigureLogging(configureLogging)
